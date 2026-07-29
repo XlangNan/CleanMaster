@@ -19,11 +19,11 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: 还原依赖
-        run: dotnet restore CleanMaster/CleanMaster.csproj
+        run: dotnet restore CleanMaster.csproj
 
       - name: 发布为单文件自包含 exe
         run: >
-          dotnet publish CleanMaster/CleanMaster.csproj
+          dotnet publish CleanMaster.csproj
           -c Release
           -r win-x64
           --self-contained true
