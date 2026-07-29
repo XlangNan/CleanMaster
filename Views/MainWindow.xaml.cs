@@ -45,8 +45,7 @@ namespace CleanMaster.Views
             _mediumRiskItems.Clear();
             TotalSizeText.Text = "扫描中…";
 
-            var rulesPath = Path.Combine(AppContext.BaseDirectory, "Resources", "Rules.json");
-            var rules = _scanner.LoadRules(rulesPath);
+            var rules = _scanner.LoadRulesFromEmbeddedResource();
 
             _scanner.OnProgress += path =>
             {
