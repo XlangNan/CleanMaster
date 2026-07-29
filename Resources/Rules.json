@@ -1,0 +1,145 @@
+[
+  {
+    "Id": "sys_windows_temp",
+    "Category": "系统临时文件",
+    "DisplayName": "Windows 临时文件",
+    "Paths": [ "%TEMP%", "C:\\Windows\\Temp" ],
+    "Risk": "Low",
+    "Explanation": "系统和软件运行时产生的临时文件,删除不影响任何软件正常使用",
+    "Reversible": false,
+    "DeleteDirectoryItself": false
+  },
+  {
+    "Id": "sys_prefetch",
+    "Category": "系统临时文件",
+    "DisplayName": "Prefetch 预读取缓存",
+    "Paths": [ "C:\\Windows\\Prefetch" ],
+    "Risk": "Low",
+    "Explanation": "系统用于加速程序启动的预读取缓存,删除后首次启动相关程序会略慢,之后自动重建",
+    "Reversible": false,
+    "DeleteDirectoryItself": false
+  },
+  {
+    "Id": "sys_windows_update_cache",
+    "Category": "系统临时文件",
+    "DisplayName": "Windows Update 安装包缓存",
+    "Paths": [ "C:\\Windows\\SoftwareDistribution\\Download" ],
+    "Risk": "Low",
+    "Explanation": "已安装更新的安装包残留,删除不影响已安装的更新,不影响后续更新检测",
+    "Reversible": false,
+    "DeleteDirectoryItself": false
+  },
+  {
+    "Id": "sys_thumbnail_cache",
+    "Category": "系统临时文件",
+    "DisplayName": "缩略图缓存",
+    "Paths": [ "%LOCALAPPDATA%\\Microsoft\\Windows\\Explorer" ],
+    "Risk": "Low",
+    "Explanation": "图片/视频缩略图缓存数据库,删除后首次打开文件夹时缩略图重新生成,速度略慢",
+    "Reversible": false,
+    "DeleteDirectoryItself": false
+  },
+
+  {
+    "Id": "browser_chrome_cache",
+    "Category": "浏览器缓存",
+    "DisplayName": "Chrome 网页缓存",
+    "Paths": [
+      "%LOCALAPPDATA%\\Google\\Chrome\\User Data\\Default\\Cache",
+      "%LOCALAPPDATA%\\Google\\Chrome\\User Data\\Default\\Code Cache",
+      "%LOCALAPPDATA%\\Google\\Chrome\\User Data\\Default\\GPUCache"
+    ],
+    "Risk": "Low",
+    "Explanation": "网页图片/脚本缓存,删除后网页加载会稍慢,但不影响密码和登录状态(登录数据不在此目录规则内)",
+    "Reversible": false,
+    "DeleteDirectoryItself": false
+  },
+  {
+    "Id": "browser_edge_cache",
+    "Category": "浏览器缓存",
+    "DisplayName": "Edge 网页缓存",
+    "Paths": [
+      "%LOCALAPPDATA%\\Microsoft\\Edge\\User Data\\Default\\Cache",
+      "%LOCALAPPDATA%\\Microsoft\\Edge\\User Data\\Default\\Code Cache",
+      "%LOCALAPPDATA%\\Microsoft\\Edge\\User Data\\Default\\GPUCache"
+    ],
+    "Risk": "Low",
+    "Explanation": "网页图片/脚本缓存,删除后网页加载会稍慢,但不影响密码和登录状态",
+    "Reversible": false,
+    "DeleteDirectoryItself": false
+  },
+  {
+    "Id": "browser_firefox_cache",
+    "Category": "浏览器缓存",
+    "DisplayName": "Firefox 网页缓存",
+    "Paths": [ "%LOCALAPPDATA%\\Mozilla\\Firefox\\Profiles" ],
+    "Risk": "Medium",
+    "Explanation": "Firefox 缓存与配置文件混在同一上级目录下,建议逐项确认后再清理,避免误伤书签/密码等数据",
+    "Reversible": false,
+    "DeleteDirectoryItself": false
+  },
+
+  {
+    "Id": "recycle_bin",
+    "Category": "回收站",
+    "DisplayName": "回收站",
+    "Paths": [ "C:\\$Recycle.Bin" ],
+    "Risk": "Medium",
+    "Explanation": "回收站中的文件,清空后不可恢复,请确认没有需要保留的误删文件",
+    "Reversible": false,
+    "DeleteDirectoryItself": false
+  },
+
+  {
+    "Id": "app_wechat_installer_cache",
+    "Category": "软件安装包缓存",
+    "DisplayName": "微信更新安装包缓存",
+    "Paths": [ "%LOCALAPPDATA%\\Tencent\\WeChat\\WeChat\\Update" ],
+    "Risk": "Medium",
+    "Explanation": "微信更新时下载的安装包,通常可删,但下次更新时需要重新联网下载",
+    "Reversible": false,
+    "DeleteDirectoryItself": false
+  },
+
+  {
+    "Id": "log_generic_appdata_logs",
+    "Category": "软件运行日志",
+    "DisplayName": "常见软件运行日志(近 30 天)",
+    "Paths": [ "%LOCALAPPDATA%\\Temp\\Logs" ],
+    "Risk": "Medium",
+    "Explanation": "程序运行日志,若近期有软件崩溃需要向厂商反馈问题,建议保留后再清理",
+    "Reversible": false,
+    "DeleteDirectoryItself": false
+  },
+
+  {
+    "Id": "protected_wechat_userdata",
+    "Category": "聊天软件用户数据",
+    "DisplayName": "微信聊天记录与文件(受保护,不清理)",
+    "Paths": [ "%USERPROFILE%\\Documents\\WeChat Files" ],
+    "Risk": "Excluded",
+    "Explanation": "包含聊天记录、图片、语音、视频等用户数据,本工具不会扫描或清理此目录",
+    "Reversible": false,
+    "DeleteDirectoryItself": false
+  },
+  {
+    "Id": "protected_qq_userdata",
+    "Category": "聊天软件用户数据",
+    "DisplayName": "QQ / TIM 聊天记录与文件(受保护,不清理)",
+    "Paths": [ "%USERPROFILE%\\Documents\\Tencent Files" ],
+    "Risk": "Excluded",
+    "Explanation": "包含聊天记录、图片、语音、视频等用户数据,本工具不会扫描或清理此目录",
+    "Reversible": false,
+    "DeleteDirectoryItself": false
+  },
+  {
+    "Id": "protected_browser_login_data",
+    "Category": "浏览器登录数据",
+    "DisplayName": "浏览器密码 / Cookie / 登录状态(受保护,不清理)",
+    "Paths": [ "%LOCALAPPDATA%\\Google\\Chrome\\User Data\\Default" ],
+    "Risk": "Excluded",
+    "Explanation": "包含 Login Data、Cookies、Web Data 等数据库文件,本工具不会清理此目录下的用户数据文件",
+    "Reversible": false,
+    "DeleteDirectoryItself": false
+  }
+]

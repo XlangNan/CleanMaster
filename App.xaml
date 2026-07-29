@@ -1,0 +1,105 @@
+<Application x:Class="CleanMaster.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:CleanMaster.Views"
+             StartupUri="Views/MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+
+            <conv:InverseBoolConverter x:Key="InverseBoolConverter"/>
+            <conv:BoolToVisibilityConverter x:Key="BoolToVisConverter"/>
+
+            <!-- ===== 配色方案:深色 + 紫青强调色 ===== -->
+            <SolidColorBrush x:Key="BgPrimary" Color="#0F1117"/>
+            <SolidColorBrush x:Key="BgSecondary" Color="#181B24"/>
+            <SolidColorBrush x:Key="BgCard" Color="#1F2330"/>
+            <SolidColorBrush x:Key="AccentPrimary" Color="#8B5CF6"/>
+            <SolidColorBrush x:Key="AccentSecondary" Color="#22D3EE"/>
+            <SolidColorBrush x:Key="TextPrimary" Color="#F1F2F6"/>
+            <SolidColorBrush x:Key="TextSecondary" Color="#9CA3AF"/>
+            <SolidColorBrush x:Key="RiskLow" Color="#22C55E"/>
+            <SolidColorBrush x:Key="RiskMedium" Color="#F59E0B"/>
+            <SolidColorBrush x:Key="RiskExcluded" Color="#EF4444"/>
+            <SolidColorBrush x:Key="BorderSubtle" Color="#2A2E3A"/>
+
+            <!-- 卡片样式 -->
+            <Style x:Key="CardStyle" TargetType="Border">
+                <Setter Property="Background" Value="{StaticResource BgCard}"/>
+                <Setter Property="CornerRadius" Value="10"/>
+                <Setter Property="Padding" Value="16"/>
+                <Setter Property="Margin" Value="0,0,0,10"/>
+                <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+            </Style>
+
+            <!-- 主按钮样式 -->
+            <Style x:Key="PrimaryButton" TargetType="Button">
+                <Setter Property="Background" Value="{StaticResource AccentPrimary}"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Padding" Value="18,10"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}"
+                                    CornerRadius="8"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- 次级按钮样式 -->
+            <Style x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+            </Style>
+
+            <!-- 单个扫描结果条目的卡片模板,LowRiskList / MediumRiskList 共用。
+                 未显式指定 DataType,靠属性名匹配 ScanItemViewModel 的成员 -->
+            <DataTemplate x:Key="ScanItemTemplate">
+                <Border Background="{StaticResource BgCard}" CornerRadius="8"
+                        Padding="14,10" Margin="0,0,0,8"
+                        BorderBrush="{StaticResource BorderSubtle}" BorderThickness="1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <CheckBox Grid.Column="0" VerticalAlignment="Top" Margin="0,2,12,0"
+                                  IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                  IsEnabled="{Binding AccessDenied, Converter={StaticResource InverseBoolConverter}}"/>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{Binding DisplayName}" Foreground="{StaticResource TextPrimary}"
+                                       FontWeight="SemiBold" FontSize="14"/>
+                            <TextBlock Text="{Binding Explanation}" Foreground="{StaticResource TextSecondary}"
+                                       FontSize="12" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                            <TextBlock Text="权限不足,建议以管理员身份运行本程序后重新扫描"
+                                       Foreground="{StaticResource RiskMedium}" FontSize="12" Margin="0,3,0,0"
+                                       Visibility="{Binding AccessDenied, Converter={StaticResource BoolToVisConverter}}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                            <TextBlock Text="{Binding SizeDisplay}" Foreground="{StaticResource AccentSecondary}"
+                                       FontWeight="Bold" FontSize="15" HorizontalAlignment="Right"/>
+                            <TextBlock Foreground="{StaticResource TextSecondary}" FontSize="11" HorizontalAlignment="Right">
+                                <Run Text="{Binding FileCount, Mode=OneWay}"/>
+                                <Run Text=" 个文件"/>
+                            </TextBlock>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
