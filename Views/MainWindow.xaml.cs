@@ -16,6 +16,7 @@ namespace CleanMaster.Views
 
         private readonly ObservableCollection<ScanItemViewModel> _lowRiskItems = new();
         private readonly ObservableCollection<ScanItemViewModel> _mediumRiskItems = new();
+        private readonly ObservableCollection<ScanItemViewModel> _discoveredItems = new();
 
         public MainWindow()
         {
@@ -23,6 +24,7 @@ namespace CleanMaster.Views
 
             LowRiskList.ItemsSource = _lowRiskItems;
             MediumRiskList.ItemsSource = _mediumRiskItems;
+            DiscoveredList.ItemsSource = _discoveredItems;
             ExcludedNotesList.ItemsSource = ProtectedPaths.UserFacingExclusionNotes;
 
             // 启动时先清掉超过保留期的历史隔离批次,避免隔离区无限增长占用磁盘
@@ -43,6 +45,7 @@ namespace CleanMaster.Views
             CleanButton.IsEnabled = false;
             _lowRiskItems.Clear();
             _mediumRiskItems.Clear();
+            _discoveredItems.Clear();
             TotalSizeText.Text = "扫描中…";
 
             var rules = _scanner.LoadRulesFromEmbeddedResource();
@@ -52,7 +55,10 @@ namespace CleanMaster.Views
                 Dispatcher.Invoke(() => ScanStatusText.Text = $"正在扫描: {path}");
             };
 
+            // 第一步:静态规则库扫描(人工验证过的已知软件路径)
             var results = await _scanner.ScanAsync(rules);
+            var knownPaths = new HashSet<string>(
+                results.Select(r => r.ResolvedPath), StringComparer.OrdinalIgnoreCase);
 
             foreach (var item in results.OrderByDescending(r => r.SizeBytes))
             {
@@ -65,9 +71,24 @@ namespace CleanMaster.Views
                     _mediumRiskItems.Add(vm);
             }
 
-            var totalBytes = results.Sum(r => r.SizeBytes);
+            // 第二步:启发式扫描(自动发现 AppData 下疑似缓存的目录),
+            // 与静态规则库按路径去重,避免同一个目录在两个分类里各出现一次
+            ScanStatusText.Text = "正在自动发现更多软件缓存…";
+            var discovered = await _scanner.ScanHeuristicAsync();
+
+            foreach (var item in discovered
+                         .Where(d => !knownPaths.Contains(d.ResolvedPath))
+                         .OrderByDescending(r => r.SizeBytes))
+            {
+                var vm = new ScanItemViewModel(item);
+                vm.PropertyChanged += (_, __) => UpdateSelectionSummary();
+                _discoveredItems.Add(vm);
+            }
+
+            var totalBytes = results.Sum(r => r.SizeBytes) + discovered.Sum(r => r.SizeBytes);
+            var totalCount = results.Count + discovered.Count;
             TotalSizeText.Text = FormatSize(totalBytes);
-            ScanStatusText.Text = $"扫描完成,共发现 {results.Count} 项,合计 {FormatSize(totalBytes)}";
+            ScanStatusText.Text = $"扫描完成,共发现 {totalCount} 项,合计 {FormatSize(totalBytes)}";
 
             ScanButton.IsEnabled = true;
             ScanButton.Content = "重新扫描";
@@ -76,10 +97,10 @@ namespace CleanMaster.Views
 
         private void UpdateSelectionSummary()
         {
-            var allItems = _lowRiskItems.Concat(_mediumRiskItems).ToList();
+            var allItems = _lowRiskItems.Concat(_mediumRiskItems).Concat(_discoveredItems).ToList();
             var checkedItems = allItems.Where(i => i.IsChecked).ToList();
             var checkedSize = checkedItems.Sum(i => i.Item.SizeBytes);
-            var mediumCheckedCount = _mediumRiskItems.Count(i => i.IsChecked);
+            var mediumCheckedCount = _mediumRiskItems.Concat(_discoveredItems).Count(i => i.IsChecked);
 
             if (checkedItems.Count == 0)
             {
@@ -99,13 +120,13 @@ namespace CleanMaster.Views
 
         private void ClearSelection_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var i in _lowRiskItems.Concat(_mediumRiskItems))
+            foreach (var i in _lowRiskItems.Concat(_mediumRiskItems).Concat(_discoveredItems))
                 i.IsChecked = false;
         }
 
         private async void CleanButton_Click(object sender, RoutedEventArgs e)
         {
-            var checkedItems = _lowRiskItems.Concat(_mediumRiskItems)
+            var checkedItems = _lowRiskItems.Concat(_mediumRiskItems).Concat(_discoveredItems)
                 .Where(i => i.IsChecked)
                 .ToList();
 
@@ -147,6 +168,7 @@ namespace CleanMaster.Views
             {
                 _lowRiskItems.Remove(vm);
                 _mediumRiskItems.Remove(vm);
+                _discoveredItems.Remove(vm);
             }
 
             ScanStatusText.Text = "清理完成";

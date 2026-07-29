@@ -77,6 +77,12 @@
                            FontWeight="SemiBold" FontSize="14" Margin="4,16,0,8"/>
                 <ItemsControl x:Name="MediumRiskList" ItemTemplate="{StaticResource ScanItemTemplate}"/>
 
+                <!-- 分类结果:自动发现(启发式扫描,永远不默认勾选) -->
+                <TextBlock Text="🔍 自动发现的软件缓存(未经人工验证,请仔细确认)"
+                           Foreground="{StaticResource AccentSecondary}"
+                           FontWeight="SemiBold" FontSize="14" Margin="4,16,0,8"/>
+                <ItemsControl x:Name="DiscoveredList" ItemTemplate="{StaticResource ScanItemTemplate}"/>
+
                 <!-- 分类结果:不会触碰 -->
                 <TextBlock Text="🔒 本工具不会触碰" Foreground="{StaticResource RiskExcluded}"
                            FontWeight="SemiBold" FontSize="14" Margin="4,16,0,8"/>

@@ -9,19 +9,32 @@
     <AssemblyName>CleanMaster</AssemblyName>
     <RootNamespace>CleanMaster</RootNamespace>
 
+    <!-- 单文件 + 自包含发布配置,发布命令见 README -->
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SelfContained>true</SelfContained>
     <PublishSingleFile>true</PublishSingleFile>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
 
+    <!-- 需要管理员权限才能清理系统级临时目录 -->
     <ApplicationManifest>app.manifest</ApplicationManifest>
 
     <ApplicationIcon Condition="Exists('Resources\app.ico')">Resources\app.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
+    <!--
+      改为嵌入式资源而不是"复制到输出目录",因为单文件发布(PublishSingleFile)
+      只会把 CleanMaster.exe 打成一个文件,旁边的 Resources\Rules.json 不会
+      自动跟着走。嵌入到程序集内部后,规则数据真正随 exe 一起分发,
+      不用担心用户把 exe 和配置文件分开拷贝导致找不到文件。
+    -->
     <EmbeddedResource Include="Resources\Rules.json" />
   </ItemGroup>
+
+  <!-- 推荐后续加入现代化 UI 库,先留空,骨架阶段用原生 WPF 控件 -->
+  <!-- <ItemGroup>
+    <PackageReference Include="WPF-UI" Version="3.0.5" />
+  </ItemGroup> -->
 
 </Project>
